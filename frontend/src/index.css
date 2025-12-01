@@ -1,0 +1,10 @@
+@import "tailwindcss";
+
+@theme{
+  --color-mtk-fondo: #f9f9fa;
+  --color-mtk-principal: #a71705;
+}
+
+input, select{
+  @apply outline-0;
+}
