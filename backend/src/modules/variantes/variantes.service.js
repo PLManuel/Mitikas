@@ -25,18 +25,17 @@ export const crearVariante = async (data) => {
     throw new Error('El precio de venta debe ser mayor a 0');
   }
 
-    const varianteData = {
-      idProducto: data.idProducto,
-      tamano: data.tamano,
-      precioVenta: parseFloat(data.precioVenta)
-    };
+  const varianteData = {
+    idProducto: data.idProducto,
+    tamano: data.tamano,
+    precioVenta: parseFloat(data.precioVenta)
+  };
 
   const insertId = await variantesRepository.create(varianteData);
-  return {
-    id: insertId,
-    ...varianteData,
-    activo: true
-  };
+  
+  // Retornar la variante completa usando findById para tener la misma estructura
+  const varianteCreada = await variantesRepository.findById(insertId);
+  return varianteCreada;
 };
 
 export const actualizarVariante = async (id, data) => {

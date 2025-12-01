@@ -86,26 +86,32 @@ export default function VariantAdmin() {
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({
-          id_producto: form.id_producto,
+          idProducto: form.id_producto,
           tamano: form.tamano,
           precioVenta: Number(form.precioVenta)
         })
       });
-      if (!res.ok) throw new Error('Error al crear variante');
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Error al crear variante');
+      }
+      const nuevaVariante = await res.json();
       handleCloseDialog();
-      // Recargar variantes
+      
+      // Agregar la nueva variante al estado inmediatamente
       const product = products.find(p => p.id === form.id_producto);
-      if (product) {
-        const res2 = await fetch(`http://localhost:5173/api/variantes/producto/${product.id}`, {
-          credentials: 'include'
-        });
-        if (res2.ok) {
-          const vars: VarianteProducto[] = await res2.json();
-          setAllVariants(prev => [
-            ...prev.filter(v => v.id_producto !== product.id),
-            ...vars.map(v => ({ ...v, producto: product }))
-          ]);
-        }
+      if (product && nuevaVariante) {
+        setAllVariants(prev => [
+          ...prev,
+          {
+            id: nuevaVariante.id,
+            id_producto: nuevaVariante.idProducto,
+            tamano: nuevaVariante.tamano,
+            precioVenta: nuevaVariante.precioVenta,
+            activo: nuevaVariante.activo,
+            producto: product
+          }
+        ]);
       }
     } catch (err: any) {
       setFormError(err.message || 'Error de red');
@@ -132,11 +138,20 @@ export default function VariantAdmin() {
           precioVenta: Number(form.precioVenta)
         })
       });
-      if (!res.ok) throw new Error('Error al actualizar variante');
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Error al actualizar variante');
+      }
       handleCloseEditDialog();
-      // Actualizar en el estado local
+      // Actualizar en el estado local inmediatamente
       setAllVariants(prev => prev.map(v => 
-        v.id === form.id ? { ...v, tamano: form.tamano!, precioVenta: Number(form.precioVenta!) } : v
+        v.id === form.id 
+          ? { 
+              ...v, 
+              tamano: form.tamano!, 
+              precioVenta: Number(form.precioVenta!) 
+            } 
+          : v
       ));
     } catch (err: any) {
       setFormError(err.message || 'Error de red');
