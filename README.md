@@ -50,8 +50,7 @@ Crear un archivo `.env` en la carpeta `backend/` con el siguiente contenido:
 
 ```env
 # Configuración del servidor
-PORT=5000
-NODE_ENV=development
+PORT=3000
 
 # Configuración de la base de datos
 DB_HOST=localhost
@@ -75,7 +74,7 @@ npm run dev
 ```
 
 Este comando ejecutará:
-- **Backend** en `http://localhost:5000`
+- **Backend** en `http://localhost:3000`
 - **Frontend** en `http://localhost:5173`
 
 ### Ejecutar solo el backend
