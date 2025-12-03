@@ -4,8 +4,6 @@ import * as variantesRepository from '../variantes/variantes.repository.js';
 import * as promocionesRepository from '../promociones/promociones.repository.js';
 
 const calcularPrecioConPromocion = (precioOriginal, promocion) => {
-  // DEBUG
-  console.log('[PROMO] calcularPrecioConPromocion', { precioOriginal, promocion });
   if (!promocion) return precioOriginal;
   
   if (promocion.tipoPromocion === 'porcentaje') {
@@ -22,15 +20,6 @@ const calcularTotalesItem = (item) => {
   const precioConPromocion = calcularPrecioConPromocion(item.precioUnitario, promoObj);
   const subtotal = precioConPromocion * item.cantidad;
   const descuento = (item.precioUnitario * item.cantidad) - subtotal;
-  // DEBUG
-  console.log('[PROMO] calcularTotalesItem', {
-    idVariante: item.idVariante,
-    idPromocion: item.idPromocion,
-    precioUnitario: item.precioUnitario,
-    precioConPromocion,
-    subtotal,
-    descuento
-  });
   return {
     ...item,
     precioConDescuento: precioConPromocion,
@@ -41,9 +30,7 @@ const calcularTotalesItem = (item) => {
 
 export const obtenerCarrito = async (idUsuario) => {
   const items = await carritoRepository.findByUsuario(idUsuario);
-  console.log('[PROMO] obtenerCarrito items', items);
   const itemsConTotales = items.map(calcularTotalesItem);
-  console.log('[PROMO] obtenerCarrito itemsConTotales', itemsConTotales);
   const total = itemsConTotales.reduce((sum, item) => sum + item.subtotal, 0);
   const totalDescuentos = itemsConTotales.reduce((sum, item) => sum + item.descuento, 0);
   const cantidadItems = itemsConTotales.length;
@@ -62,8 +49,6 @@ export const obtenerCarrito = async (idUsuario) => {
 };
 
 export const agregarAlCarrito = async (idUsuario, data) => {
-  console.log('[PROMO] agregarAlCarrito', { idUsuario, data });
-  // Validar producto
   const producto = await productosRepository.findById(data.idProducto);
   if (!producto) {
     throw new Error('Producto no encontrado');
@@ -116,13 +101,11 @@ export const agregarAlCarrito = async (idUsuario, data) => {
   const itemExistente = await carritoRepository.findByUsuarioAndVariante(idUsuario, data.idVariante);
 
   if (itemExistente) {
-    console.log('[PROMO] itemExistente', itemExistente);
     // Actualizar cantidad
     const nuevaCantidad = itemExistente.cantidad + cantidad;
     await carritoRepository.updateCantidad(itemExistente.id, nuevaCantidad);
     // Siempre actualizar la promoción (aunque sea igual)
     await carritoRepository.updatePromocion(itemExistente.id, idPromocion);
-    console.log('[PROMO] updateCantidad y updatePromocion', { id: itemExistente.id, nuevaCantidad, idPromocion });
     return { 
       message: 'Cantidad actualizada en el carrito',
       id: itemExistente.id
