@@ -127,6 +127,10 @@ export const crearPedido = async (idUsuario, data) => {
     if (!direccion) {
       throw new Error('La dirección es obligatoria para entrega a domicilio');
     }
+  } else {
+    // Entrega en local: dirección por defecto
+    direccion = 'Av. Aviación 5095, Tienda 78-79, Surco';
+    costoEnvio = 0;
   }
 
   // Calcular totales

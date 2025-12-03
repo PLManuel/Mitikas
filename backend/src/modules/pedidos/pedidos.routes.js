@@ -8,6 +8,7 @@ const router = Router();
 // Usuarios autenticados
 router.get('/', autenticar, pedidosController.listarPedidos);
 router.get('/mis-pedidos', autenticar, pedidosController.listarPedidosUsuario);
+router.get('/:id/boleta', autenticar, pedidosController.obtenerBoleta);
 router.get('/:id', autenticar, pedidosController.obtenerPedidoPorId);
 router.post('/', autenticar, pedidosController.crearPedido);
 
