@@ -26,10 +26,6 @@ export const crearCategoria = async (req, res, next) => {
   try {
     const data = req.body;
     const imagen = req.file;
-    console.log('Crear categoría - body recibido:', data);
-    if (imagen) {
-      console.log('Crear categoría - imagen recibida:', imagen.originalname || imagen.filename);
-    }
 
     const nombreCategoria = data.nombre || data.categoria;
     if (!nombreCategoria) {
