@@ -28,13 +28,13 @@ export const obtenerVariantesPorProducto = async (req, res, next) => {
     const variantes = await variantesService.obtenerVariantesPorProducto(idProducto);
     res.json(variantes);
   } catch (error) {
+    console.error(`[VARIANTES] Error al obtener variantes:`, error);
     next(error);
   }
 };
 
 export const crearVariante = async (req, res, next) => {
   try {
-    console.log('REQ.BODY crearVariante:', req.body);
     const data = req.body;
 
     if (!data.idProducto || !data.tamano || !data.precioVenta) {
@@ -56,7 +56,6 @@ export const crearVariante = async (req, res, next) => {
 export const actualizarVariante = async (req, res, next) => {
   try {
     const { id } = req.params;
-    console.log('REQ.BODY actualizarVariante:', req.body);
     const data = req.body;
 
     const varianteActualizada = await variantesService.actualizarVariante(id, data);
