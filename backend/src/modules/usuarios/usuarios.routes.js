@@ -14,6 +14,7 @@ router.post('/', usuariosController.crearUsuario);
 // Rutas protegidas - requieren autenticación
 router.get('/', autenticar, usuariosController.listarUsuarios);
 router.get('/:id', autenticar, usuariosController.obtenerUsuarioPorId);
+router.put('/perfil', autenticar, usuariosController.actualizarPerfil); // Actualizar propio perfil
 
 // Rutas solo para admin
 router.put('/:id', autenticar, soloAdmin, usuariosController.actualizarUsuario);

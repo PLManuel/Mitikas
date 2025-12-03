@@ -133,6 +133,47 @@ export const actualizarUsuario = async (id, data, usuarioActual) => {
   return { id: parseInt(id), ...usuarioData, activo: usuario.activo };
 };
 
+export const actualizarPerfil = async (idUsuario, data) => {
+  const usuario = await usuariosRepository.findById(idUsuario);
+  
+  if (!usuario) {
+    throw new Error('Usuario no encontrado');
+  }
+
+  // Si se actualiza el correo, verificar que no exista otro usuario con ese correo
+  if (data.correo && data.correo !== usuario.correo) {
+    const existente = await usuariosRepository.findByCorreo(data.correo);
+    if (existente) {
+      throw new Error('El correo ya está en uso');
+    }
+  }
+
+  const usuarioData = {
+    nombre: data.nombre || usuario.nombre,
+    apellidos: data.apellidos || usuario.apellidos,
+    dni: data.dni || usuario.dni,
+    telefono: data.telefono || usuario.telefono,
+    correo: data.correo || usuario.correo,
+    rol: usuario.rol, // Mantener el rol existente
+  };
+
+  // Si se envía nueva contraseña, hashearla
+  if (data.password) {
+    usuarioData.password = await hashPassword(data.password);
+  }
+
+  await usuariosRepository.update(idUsuario, usuarioData);
+  
+  // Retornar usuario sin password
+  const { password, ...usuarioSinPassword } = { 
+    id: parseInt(idUsuario), 
+    ...usuarioData, 
+    activo: usuario.activo,
+  };
+  
+  return usuarioSinPassword;
+};
+
 export const eliminarUsuario = async (id, usuarioActual) => {
   const usuario = await usuariosRepository.findById(id);
   

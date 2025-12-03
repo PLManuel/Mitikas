@@ -142,6 +142,31 @@ export const actualizarUsuario = async (req, res, next) => {
   }
 };
 
+export const actualizarPerfil = async (req, res, next) => {
+  try {
+    const idUsuario = req.session.usuario.id;
+    const data = req.body;
+    
+    const usuarioActualizado = await usuariosService.actualizarPerfil(idUsuario, data);
+    
+    // Actualizar sesión con los nuevos datos
+    req.session.usuario = { ...req.session.usuario, ...usuarioActualizado };
+    
+    res.json({ 
+      message: 'Perfil actualizado correctamente',
+      usuario: usuarioActualizado 
+    });
+  } catch (error) {
+    if (error.message.includes('no encontrado')) {
+      return res.status(404).json({ message: error.message });
+    }
+    if (error.message.includes('ya está en uso')) {
+      return res.status(400).json({ message: error.message });
+    }
+    next(error);
+  }
+};
+
 export const eliminarUsuario = async (req, res, next) => {
   try {
     const { id } = req.params;
