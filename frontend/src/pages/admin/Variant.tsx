@@ -26,7 +26,7 @@ export default function VariantAdmin() {
       try {
         const allVars: (VarianteProducto & { producto?: Producto })[] = [];
         for (const product of products) {
-          const res = await fetch(`http://localhost:5173/api/variantes/producto/${product.id}`, {
+          const res = await fetch(`/api/variantes/producto/${product.id}`, {
             credentials: 'include'
           });
           if (res.ok) {
@@ -81,7 +81,7 @@ export default function VariantAdmin() {
     }
     setSaving(true);
     try {
-      const res = await fetch('http://localhost:5173/api/variantes', {
+      const res = await fetch('/api/variantes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -91,28 +91,31 @@ export default function VariantAdmin() {
           precioVenta: Number(form.precioVenta)
         })
       });
+      
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
         throw new Error(errorData.message || 'Error al crear variante');
       }
+      
       const nuevaVariante = await res.json();
-      handleCloseDialog();
       
       // Agregar la nueva variante al estado inmediatamente
-      const product = products.find(p => p.id === form.id_producto);
+      const product = products.find(p => p.id === Number(form.id_producto));
+      
       if (product && nuevaVariante) {
-        setAllVariants(prev => [
-          ...prev,
-          {
-            id: nuevaVariante.id,
-            id_producto: nuevaVariante.idProducto,
-            tamano: nuevaVariante.tamano,
-            precioVenta: nuevaVariante.precioVenta,
-            activo: nuevaVariante.activo,
-            producto: product
-          }
-        ]);
+        const varianteFormateada = {
+          id: nuevaVariante.id,
+          id_producto: Number(form.id_producto),
+          tamano: nuevaVariante.tamano,
+          precioVenta: Number(nuevaVariante.precioVenta),
+          activo: nuevaVariante.activo !== undefined ? nuevaVariante.activo : true,
+          producto: product
+        };
+        setAllVariants(prev => [...prev, varianteFormateada]);
       }
+      
+      setForm({});
+      handleCloseDialog();
     } catch (err: any) {
       setFormError(err.message || 'Error de red');
     } finally {
@@ -129,7 +132,7 @@ export default function VariantAdmin() {
     }
     setSaving(true);
     try {
-      const res = await fetch(`http://localhost:5173/api/variantes/${form.id}`, {
+      const res = await fetch(`/api/variantes/${form.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -163,7 +166,7 @@ export default function VariantAdmin() {
   const handleToggleVariant = async (variant: VarianteProducto) => {
     try {
       const endpoint = variant.activo ? 'desactivar' : 'activar';
-      const res = await fetch(`http://localhost:5173/api/variantes/${variant.id}/${endpoint}`, {
+      const res = await fetch(`/api/variantes/${variant.id}/${endpoint}`, {
         method: 'PATCH',
         credentials: 'include'
       });

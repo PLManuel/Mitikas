@@ -19,6 +19,7 @@ import Home from './pages/Home'
 import About from './pages/About'
 import Orders from './pages/Orders'
 import MisTarjetas from './pages/MisTarjetas'
+import { Profile } from './pages/Profile'
 import Dashboard from './pages/admin/Dashboard'
 import Category from './pages/admin/Category'
 import User from './pages/admin/User'
@@ -41,6 +42,7 @@ createRoot(document.getElementById('root')!).render(
             <Route index element={<Home />} />
             <Route path='nosotros' element={<About />} />
             <Route element={<ProtectedRoute />}>
+              <Route path='perfil' element={<Profile />} />
               <Route path='pedidos' element={<Orders />} />
               <Route path='mis-tarjetas' element={<MisTarjetas />} />
             </Route>

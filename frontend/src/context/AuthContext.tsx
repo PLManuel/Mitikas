@@ -13,6 +13,7 @@ interface AuthContextProps {
   logout: () => Promise<void>;
   refresh: () => Promise<Usuario | null>;
   setUser: (u: Usuario | null) => void;
+  updateUser: (u: Usuario) => void;
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
@@ -125,8 +126,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setLoading(false);
   }, [clearCart]);
 
+  // Update user (para actualizar datos sin recargar todo)
+  const updateUser = useCallback((updatedUser: Usuario) => {
+    setUser(updatedUser);
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ user, loading, error, setError, login, register, logout, refresh: fetchMe, setUser }}>
+    <AuthContext.Provider value={{ user, loading, error, setError, login, register, logout, refresh: fetchMe, setUser, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

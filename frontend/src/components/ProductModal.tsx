@@ -65,7 +65,7 @@ export function ProductModal({ open, onClose, producto, variantes, onAddToCart }
         <div className="relative bg-linear-to-r from-mtk-principal to-red-700 p-4">
           <button
             type="button"
-            className="absolute top-3 right-3 p-1.5 bg-white/20 hover:bg-white/30 rounded-full transition-colors backdrop-blur-sm"
+            className="absolute z-50 top-3 right-3 p-1.5 bg-white/20 hover:bg-white/30 rounded-full transition-colors backdrop-blur-sm"
             onClick={onClose}
             aria-label="Cerrar modal"
           >

@@ -47,8 +47,37 @@ export function usePedidoModal(
         body: JSON.stringify(data),
       });
       if (!res.ok) throw new Error('Error al procesar el pedido');
+      
+      const result = await res.json();
+      const pedidoId = result.pedido?.id;
+      
       setSuccess('¡Pedido realizado con éxito!');
       if (clearCart) clearCart();
+
+      // Descargar la boleta automáticamente
+      if (pedidoId) {
+        setTimeout(async () => {
+          try {
+            const boletaRes = await fetch(`/api/pedidos/${pedidoId}/boleta`, {
+              credentials: 'include',
+            });
+            if (boletaRes.ok) {
+              const blob = await boletaRes.blob();
+              const url = URL.createObjectURL(blob);
+              const link = document.createElement('a');
+              link.href = url;
+              link.download = `boleta_${pedidoId}.pdf`;
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+              URL.revokeObjectURL(url);
+            }
+          } catch (err) {
+            console.error('Error descargando boleta:', err);
+          }
+        }, 500);
+      }
+
       setTimeout(() => {
         setOpen(false);
         setSuccess(null);
