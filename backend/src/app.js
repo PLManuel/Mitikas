@@ -14,7 +14,7 @@ const app = express();
 
 // CORS debe configurarse para permitir credenciales
 app.use(cors({
-  origin: 'http://localhost:5173', // URL del frontend
+  origin: true, // Permite todos los orígenes
   credentials: true
 }));
 
