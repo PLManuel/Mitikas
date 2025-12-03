@@ -6,12 +6,13 @@ const MySQLSessionStore = MySQLStore(session);
 
 const sessionStore = new MySQLSessionStore({
   host: config.db.host,
+  port: config.db.port || 3306,
   user: config.db.user,
   password: config.db.password,
   database: config.db.name,
   clearExpired: true,
-  checkExpirationInterval: 900000, // 15 minutos
-  expiration: 86400000, // 24 horas
+  checkExpirationInterval: 900000,
+  expiration: 86400000,
   createDatabaseTable: true,
   schema: {
     tableName: 'sessions',
