@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
     port: 5173,
-    strictPort: true, // Falla si el puerto está ocupado en lugar de buscar otro
+    strictPort: true,
     proxy: {
       '/api': {
         target: 'http://localhost:3000',
