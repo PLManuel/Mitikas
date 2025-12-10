@@ -78,3 +78,10 @@ export const deleteById = async (id) => {
   );
   return result.affectedRows;
 };
+
+export const findRepartidoresActivos = async () => {
+  const [rows] = await pool.query(
+    'SELECT id, nombre, apellidos FROM usuarios WHERE rol = "repartidor" AND activo = 1'
+  );
+  return rows;
+};

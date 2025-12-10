@@ -22,6 +22,15 @@ export const obtenerUsuarioPorId = async (req, res, next) => {
   }
 };
 
+export const obtenerRepartidoresActivos = async (req, res, next) => {
+  try {
+    const repartidores = await usuariosService.obtenerRepartidoresActivos();
+    res.json(repartidores);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const crearUsuario = async (req, res, next) => {
   try {
     const data = req.body;

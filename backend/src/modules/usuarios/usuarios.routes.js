@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import * as usuariosController from './usuarios.controller.js';
-import { autenticar, soloAdmin } from '../../middlewares/auth.middleware.js';
+import { autenticar, soloAdmin, soloRolesAdmin } from '../../middlewares/auth.middleware.js';
 
 const router = Router();
 
@@ -13,8 +13,8 @@ router.post('/', usuariosController.crearUsuario);
 
 // Rutas protegidas - requieren autenticación
 router.get('/', autenticar, usuariosController.listarUsuarios);
+router.get('/repartidores/activos', autenticar, soloRolesAdmin, usuariosController.obtenerRepartidoresActivos);
 router.get('/:id', autenticar, usuariosController.obtenerUsuarioPorId);
-router.put('/perfil', autenticar, usuariosController.actualizarPerfil); // Actualizar propio perfil
 
 // Rutas solo para admin
 router.put('/:id', autenticar, soloAdmin, usuariosController.actualizarUsuario);

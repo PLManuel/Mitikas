@@ -9,6 +9,10 @@ export const obtenerUsuarioPorId = (id) => {
   return usuariosRepository.findById(id);
 };
 
+export const obtenerRepartidoresActivos = () => {
+  return usuariosRepository.findRepartidoresActivos();
+};
+
 export const crearUsuario = async (data) => {
   const passwordHasheado = await hashPassword(data.password);
 
