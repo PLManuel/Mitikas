@@ -14,7 +14,7 @@ CREATE TABLE
     telefono VARCHAR(15) NOT NULL,
     correo VARCHAR(80) NOT NULL UNIQUE,
     password VARCHAR(100) NOT NULL,
-    rol ENUM('cliente', 'admin', 'almacen', 'logistica') NOT NULL DEFAULT 'cliente',
+    rol ENUM('cliente', 'admin', 'almacen', 'logistica', 'despachador', 'repartidor') NOT NULL DEFAULT 'cliente',
     activo BOOLEAN NOT NULL DEFAULT TRUE
   );
 
@@ -153,16 +153,19 @@ CREATE TABLE
     proceso ENUM(
       'solicitud_recibida',
       'en_preparacion',
+      'listo_para_recoger',
       'en_camino',
       'entregado'
     ) NOT NULL DEFAULT 'solicitud_recibida',
     idUsuario INT NULL,
     idMetodoPago INT NOT NULL,
     idTarjetaSimulada INT DEFAULT NULL,
+    id_repartidor INT NULL,
     FOREIGN KEY (idTarjetaSimulada) REFERENCES tarjetas_simuladas (id),
     FOREIGN KEY (idUsuario) REFERENCES usuarios (id) ON DELETE SET NULL ON UPDATE CASCADE,
     FOREIGN KEY (idMetodoPago) REFERENCES metodospago (id) ON UPDATE CASCADE,
-    FOREIGN KEY (idZonaDelivery) REFERENCES zonas_delivery (id)
+    FOREIGN KEY (idZonaDelivery) REFERENCES zonas_delivery (id),
+    FOREIGN KEY (id_repartidor) REFERENCES usuarios (id) ON DELETE SET NULL
   );
 
 -- =========================
@@ -185,3 +188,19 @@ CREATE TABLE
     FOREIGN KEY (idVariante) REFERENCES variantes_producto (id) ON UPDATE CASCADE,
     FOREIGN KEY (idPromocion) REFERENCES promociones (id) ON DELETE SET NULL ON UPDATE CASCADE
   );
+
+CREATE TABLE solicitudes_productos (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  id_pedido INT NOT NULL,
+  id_variante INT NOT NULL,
+  cantidad_solicitada INT NOT NULL,
+  estado ENUM('pendiente', 'en_proceso', 'recibido') DEFAULT 'pendiente',
+  fecha_solicitud TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  fecha_recepcion TIMESTAMP NULL,
+  notas TEXT NULL,
+  FOREIGN KEY (id_pedido) REFERENCES pedidos(id) ON DELETE CASCADE,
+  FOREIGN KEY (id_variante) REFERENCES variantes_producto(id) ON DELETE CASCADE,
+  INDEX idx_estado (estado),
+  INDEX idx_variante (id_variante),
+  INDEX idx_pedido (id_pedido)
+);
