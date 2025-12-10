@@ -55,10 +55,18 @@ export const create = async (pedido) => {
   return result.insertId;
 };
 
-export const updateProceso = async (id, proceso) => {
-  const [result] = await pool.query(
-    'UPDATE pedidos SET proceso = ? WHERE id = ?',
-    [proceso, id]
-  );
+export const updateProceso = async (id, proceso, idRepartidor = null) => {
+  let query = 'UPDATE pedidos SET proceso = ?';
+  let params = [proceso];
+  
+  if (idRepartidor !== null) {
+    query += ', id_repartidor = ?';
+    params.push(idRepartidor);
+  }
+  
+  query += ' WHERE id = ?';
+  params.push(id);
+  
+  const [result] = await pool.query(query, params);
   return result.affectedRows;
 };

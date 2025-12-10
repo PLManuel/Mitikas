@@ -1,3 +1,10 @@
+import * as pedidosRepository from './pedidos.repository.js';
+import * as detallePedidoRepository from './detalle-pedido.repository.js';
+import * as carritoService from '../carrito/carrito.service.js';
+import * as zonasDeliveryRepository from '../zonas-delivery/zonas-delivery.repository.js';
+import * as metodosPagoRepository from '../metodos-pago/metodos-pago.repository.js';
+import * as tarjetasService from '../tarjetas/tarjetas.service.js';
+
 // Devuelve pedidos del usuario con detalles y totales
 export const listarPedidosPorUsuario = async (idUsuario) => {
   const pedidos = await pedidosRepository.findByUsuario(idUsuario);
@@ -26,6 +33,7 @@ export const listarPedidosPorUsuario = async (idUsuario) => {
       proceso: p.proceso,
       productos: detalle.map(item => ({
         id: item.id,
+        idVariante: item.idVariante,
         nombreProducto: item.nombreProducto,
         tamano: item.tamano,
         cantidad: item.cantidad,
@@ -38,12 +46,6 @@ export const listarPedidosPorUsuario = async (idUsuario) => {
   }));
   return pedidosConDetalle;
 };
-import * as pedidosRepository from './pedidos.repository.js';
-import * as detallePedidoRepository from './detalle-pedido.repository.js';
-import * as carritoService from '../carrito/carrito.service.js';
-import * as zonasDeliveryRepository from '../zonas-delivery/zonas-delivery.repository.js';
-import * as metodosPagoRepository from '../metodos-pago/metodos-pago.repository.js';
-import * as tarjetasService from '../tarjetas/tarjetas.service.js';
 
 export const listarPedidos = async () => {
   const pedidos = await pedidosRepository.findAll();
@@ -73,6 +75,7 @@ export const listarPedidos = async () => {
       proceso: p.proceso,
       productos: detalle.map(item => ({
         id: item.id,
+        idVariante: item.idVariante,
         nombreProducto: item.nombreProducto,
         tamano: item.tamano,
         cantidad: item.cantidad,
@@ -194,11 +197,11 @@ export const crearPedido = async (idUsuario, data) => {
   return { id: idPedido, total, subtotal, descuentos, costoEnvio: zona ? zona.costo : 0 };
 };
 
-export const cambiarEstadoPedido = async (id, proceso) => {
-  const validos = ['solicitud_recibida','en_preparacion','en_camino','entregado'];
+export const cambiarEstadoPedido = async (id, proceso, idRepartidor = null) => {
+  const validos = ['solicitud_recibida','en_preparacion','listo_para_recoger','en_camino','entregado'];
   if (!validos.includes(proceso)) {
     throw new Error('Estado de proceso no válido');
   }
-  await pedidosRepository.updateProceso(id, proceso);
+  await pedidosRepository.updateProceso(id, proceso, idRepartidor);
   return { message: 'Estado actualizado correctamente' };
 };

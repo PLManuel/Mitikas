@@ -1,16 +1,16 @@
-export const listarPedidosUsuario = async (req, res, next) => {
+import * as pedidosService from './pedidos.service.js';
+import { generarBoletaPdf } from '../../utils/pdf.js';
+
+export const listarPedidos = async (req, res, next) => {
   try {
-    const idUsuario = req.session.usuario.id;
-    const pedidos = await pedidosService.listarPedidosPorUsuario(idUsuario);
+    const pedidos = await pedidosService.listarPedidos();
     res.json(pedidos);
   } catch (error) {
     next(error);
   }
 };
-import * as pedidosService from './pedidos.service.js';
-import { generarBoletaPdf } from '../../utils/pdf.js';
 
-export const listarPedidos = async (req, res, next) => {
+export const listarPedidosUsuario = async (req, res, next) => {
   try {
     const pedidos = await pedidosService.listarPedidos();
     res.json(pedidos);
@@ -112,8 +112,8 @@ export const obtenerBoleta = async (req, res, next) => {
 export const cambiarEstadoPedido = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { proceso } = req.body;
-    const resultado = await pedidosService.cambiarEstadoPedido(id, proceso);
+    const { proceso, idRepartidor } = req.body;
+    const resultado = await pedidosService.cambiarEstadoPedido(id, proceso, idRepartidor);
     res.json(resultado);
   } catch (error) {
     if (error.message.includes('no válido')) {
