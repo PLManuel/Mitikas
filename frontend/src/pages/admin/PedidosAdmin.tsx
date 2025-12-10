@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { IconShoppingCart, IconUser, IconMapPin, IconTruck, IconClock, IconReceipt, IconDiscount, IconPackage, IconHome, IconCheck } from '@tabler/icons-react';
 
 interface ProductoPedido {
@@ -28,9 +28,16 @@ interface PedidoAdmin {
   productos: ProductoPedido[];
 }
 
+interface Repartidor {
+  id: number;
+  nombre: string;
+  apellidos: string;
+}
+
 const ESTADOS = [
   { value: 'solicitud_recibida', label: 'Solicitud recibida', color: 'bg-blue-100 text-blue-700 border-blue-300' },
   { value: 'en_preparacion', label: 'En preparación', color: 'bg-yellow-100 text-yellow-700 border-yellow-300' },
+  { value: 'listo_para_recoger', label: 'Listo para recoger', color: 'bg-indigo-100 text-indigo-700 border-indigo-300' },
   { value: 'en_camino', label: 'En camino', color: 'bg-purple-100 text-purple-700 border-purple-300' },
   { value: 'entregado', label: 'Entregado', color: 'bg-green-100 text-green-700 border-green-300' },
 ];
@@ -39,6 +46,10 @@ export default function PedidosAdmin() {
   const [pedidos, setPedidos] = useState<PedidoAdmin[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [repartidores, setRepartidores] = useState<Repartidor[]>([]);
+  const [pedidoSeleccionado, setPedidoSeleccionado] = useState<number | null>(null);
+  const [repartidorSeleccionado, setRepartidorSeleccionado] = useState<number | null>(null);
+  const modalRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
     async function fetchPedidos() {
@@ -57,12 +68,28 @@ export default function PedidosAdmin() {
     fetchPedidos();
   }, []);
 
-  const cambiarEstado = async (id: number, proceso: string) => {
+  useEffect(() => {
+    async function fetchRepartidores() {
+      try {
+        const res = await fetch('/api/usuarios/repartidores/activos', { credentials: 'include' });
+        const data = await res.json();
+        setRepartidores(Array.isArray(data) ? data : []);
+      } catch {
+        console.error('Error al cargar repartidores');
+      }
+    }
+    fetchRepartidores();
+  }, []);
+
+  const cambiarEstado = async (id: number, proceso: string, idRepartidor?: number) => {
     try {
+      const body: any = { proceso };
+      if (idRepartidor) body.idRepartidor = idRepartidor;
+      
       const res = await fetch(`/api/pedidos/${id}/estado`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ proceso }),
+        body: JSON.stringify(body),
         credentials: 'include',
       });
       if (!res.ok) throw new Error('Error al cambiar estado');
@@ -70,6 +97,21 @@ export default function PedidosAdmin() {
     } catch {
       alert('No se pudo cambiar el estado');
     }
+  };
+
+  const abrirModalRepartidor = (idPedido: number) => {
+    setPedidoSeleccionado(idPedido);
+    setRepartidorSeleccionado(null);
+    modalRef.current?.showModal();
+  };
+
+  const asignarRepartidor = async () => {
+    if (!pedidoSeleccionado || !repartidorSeleccionado) {
+      alert('Selecciona un repartidor');
+      return;
+    }
+    await cambiarEstado(pedidoSeleccionado, 'en_camino', repartidorSeleccionado);
+    modalRef.current?.close();
   };
 
   return (
@@ -113,6 +155,9 @@ export default function PedidosAdmin() {
                   <div className="flex items-center gap-2">
                     <IconReceipt className="w-5 h-5 text-mtk-principal" />
                     <span className="font-bold text-gray-800">Pedido #{p.id}</span>
+                    <span className={`px-2 py-1 rounded-lg border font-semibold text-xs ${estadoActual.color}`}>
+                      {estadoActual.label}
+                    </span>
                   </div>
                   <div className="flex items-center gap-2 text-sm text-gray-600">
                     <IconClock className="w-4 h-4" />
@@ -127,17 +172,6 @@ export default function PedidosAdmin() {
 
               {/* Contenido del pedido */}
               <div className="p-4 space-y-3">
-                {/* Estado */}
-                <div className="flex items-center gap-2">
-                  <label className="text-sm font-semibold text-gray-700">Estado:</label>
-                  <select 
-                    value={p.proceso} 
-                    onChange={e => cambiarEstado(p.id, e.target.value)} 
-                    className={`px-3 py-1.5 rounded-lg border-2 font-semibold text-sm transition-colors ${estadoActual.color}`}
-                  >
-                    {ESTADOS.map(e => <option key={e.value} value={e.value}>{e.label}</option>)}
-                  </select>
-                </div>
                 {/* Información de entrega */}
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                   <div className="flex items-center gap-2 mb-2">
@@ -219,12 +253,82 @@ export default function PedidosAdmin() {
                     <span className="text-mtk-principal">S/. {p.total?.toFixed(2) ?? '0.00'}</span>
                   </div>
                 </div>
+
+                {/* Botones de acción según tipo de entrega */}
+                {p.proceso === 'en_preparacion' && (
+                  <div className="mt-3">
+                    {p.costoEnvio === 0 ? (
+                      <button
+                        onClick={() => cambiarEstado(p.id, 'listo_para_recoger')}
+                        className="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                      >
+                        <IconHome className="w-5 h-5" />
+                        Listo para Recoger
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => abrirModalRepartidor(p.id)}
+                        className="w-full bg-purple-500 hover:bg-purple-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                      >
+                        <IconTruck className="w-5 h-5" />
+                        Asignar Repartidor
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
             </li>
             );
           })}
         </ul>
       )}
+
+      {/* Modal de asignación de repartidor */}
+      <dialog ref={modalRef} className="rounded-2xl shadow-2xl p-0 backdrop:bg-black/50 max-w-md w-full m-auto">
+        <div className="bg-white rounded-2xl overflow-hidden">
+          <div className="bg-linear-to-r from-purple-500 to-purple-600 p-6 text-white">
+            <h3 className="text-2xl font-bold flex items-center gap-2">
+              <IconTruck className="w-7 h-7" />
+              Asignar Repartidor
+            </h3>
+          </div>
+          
+          <div className="p-6 space-y-4">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Selecciona un repartidor:
+              </label>
+              <select
+                value={repartidorSeleccionado || ''}
+                onChange={(e) => setRepartidorSeleccionado(Number(e.target.value))}
+                className="w-full border-2 border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-purple-500"
+              >
+                <option value="">-- Seleccionar --</option>
+                {repartidores.map(r => (
+                  <option key={r.id} value={r.id}>
+                    {r.nombre} {r.apellidos}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex gap-3 pt-4">
+              <button
+                onClick={() => modalRef.current?.close()}
+                className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-lg transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={asignarRepartidor}
+                className="flex-1 bg-purple-500 hover:bg-purple-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+              >
+                Confirmar
+              </button>
+            </div>
+          </div>
+        </div>
+      </dialog>
     </div>
   );
 }

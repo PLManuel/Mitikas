@@ -8,7 +8,8 @@ import {
   IconResize, 
   IconPackage, 
   IconMapPin, 
-  IconDiscount 
+  IconDiscount,
+  IconHome
 } from '@tabler/icons-react';
 
 const Dashboard = () => {
@@ -18,6 +19,8 @@ const Dashboard = () => {
   const isAdmin = user.rol === 'admin';
   const isAlmacen = user.rol === 'almacen';
   const isLogistica = user.rol === 'logistica';
+  const isDespachador = user.rol === 'despachador';
+  const isRepartidor = user.rol === 'repartidor';
 
   const cards: { to: string; label: string; description: string; icon: React.ReactNode; color: string }[] = [];
 
@@ -76,17 +79,53 @@ const Dashboard = () => {
         description: 'Configura tallas y variantes',
         icon: <IconResize size={32} />,
         color: 'bg-pink-500'
+      },
+      { 
+        to: '/admin/preparacion-pedidos', 
+        label: 'Preparar Pedidos', 
+        description: 'Prepara y verifica pedidos para entrega',
+        icon: <IconPackage size={32} />,
+        color: 'bg-yellow-500'
       }
     );
   }
 
   if (isLogistica) {
+    cards.push(
+      { 
+        to: '/admin/pedidos', 
+        label: 'Pedidos', 
+        description: 'Gestiona y monitorea pedidos',
+        icon: <IconPackage size={32} />,
+        color: 'bg-red-500'
+      },
+      { 
+        to: '/admin/gestion-productos', 
+        label: 'Gestión de Productos', 
+        description: 'Gestiona solicitudes y proveedores',
+        icon: <IconPackage size={32} />,
+        color: 'bg-cyan-500'
+      }
+    );
+  }
+
+  if (isDespachador) {
     cards.push({ 
-      to: '/admin/pedidos', 
-      label: 'Pedidos', 
-      description: 'Gestiona y monitorea pedidos',
+      to: '/admin/entrega-tienda', 
+      label: 'Entrega en Tienda', 
+      description: 'Gestiona entregas de pedidos en tienda',
+      icon: <IconHome size={32} />,
+      color: 'bg-yellow-500'
+    });
+  }
+
+  if (isRepartidor) {
+    cards.push({ 
+      to: '/admin/entrega-domicilio', 
+      label: 'Entrega a Domicilio', 
+      description: 'Gestiona entregas de pedidos a domicilio',
       icon: <IconPackage size={32} />,
-      color: 'bg-red-500'
+      color: 'bg-purple-500'
     });
   }
 

@@ -13,7 +13,7 @@ export default function ClientNav() {
           <span>Inicio</span>
         </Link>
       </li>
-      {(user?.rol === 'admin' || user?.rol === 'almacen' || user?.rol === 'logistica') && (
+      {(user?.rol === 'admin' || user?.rol === 'almacen' || user?.rol === 'logistica' || user?.rol === 'despachador' || user?.rol === 'repartidor') && (
         <li>
           <Link to="/admin" className="flex items-center gap-2 text-gray-700 hover:text-mtk-principal transition-colors font-medium">
             <IconShield size={20} />

@@ -18,13 +18,15 @@ import {
   IconDots
 } from '@tabler/icons-react';
 
-const roles: Role[] = ['cliente', 'admin', 'almacen', 'logistica'];
+const roles: Role[] = ['cliente', 'admin', 'almacen', 'logistica', 'despachador', 'repartidor'];
 
 const roleColors: Record<Role, string> = {
   cliente: 'bg-blue-100 text-blue-700',
   admin: 'bg-red-100 text-red-700',
   almacen: 'bg-green-100 text-green-700',
   logistica: 'bg-purple-100 text-purple-700',
+  despachador: 'bg-yellow-100 text-yellow-700',
+  repartidor: 'bg-orange-100 text-orange-700',
 };
 
 export default function UserAdmin() {

@@ -23,6 +23,10 @@ import { Profile } from './pages/Profile'
 import Dashboard from './pages/admin/Dashboard'
 import Category from './pages/admin/Category'
 import User from './pages/admin/User'
+import PreparacionPedidos from './pages/PreparacionPedidos'
+import GestionProductos from './pages/GestionProductos'
+import EntregaTienda from './pages/EntregaTienda'
+import EntregaDomicilio from './pages/EntregaDomicilio'
 import Product from './pages/admin/Product';
 import Variant from './pages/admin/Variant';
 
@@ -54,7 +58,7 @@ createRoot(document.getElementById('root')!).render(
           </Route>
 
           {/* Protegido: admin, almacen y logistica pueden acceder a /admin */}
-          <Route path="/admin" element={<ProtectedRoute requiredRole={['admin', 'almacen', 'logistica']} />}>
+          <Route path="/admin" element={<ProtectedRoute requiredRole={['admin', 'almacen', 'logistica', 'despachador', 'repartidor']} />}>
             <Route element={<AdminLayout />}>
               <Route index element={<Dashboard />} />
               <Route path="categorias" element={<Category />} />
@@ -65,6 +69,10 @@ createRoot(document.getElementById('root')!).render(
               <Route path="promociones" element={<PromotionsAdmin />} />
               <Route path="zonas" element={<DeliveryZonesAdmin />} />
               <Route path="pedidos" element={<PedidosAdmin />} />
+              <Route path="preparacion-pedidos" element={<PreparacionPedidos />} />
+              <Route path="gestion-productos" element={<GestionProductos />} />
+              <Route path="entrega-tienda" element={<EntregaTienda />} />
+              <Route path="entrega-domicilio" element={<EntregaDomicilio />} />
             </Route>
           </Route>
 

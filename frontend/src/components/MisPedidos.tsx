@@ -51,6 +51,7 @@ export function MisPedidos() {
     const configs: Record<string, { label: string; color: string }> = {
       'solicitud_recibida': { label: 'Solicitud Recibida', color: 'bg-blue-100 text-blue-800' },
       'en_preparacion': { label: 'En Preparación', color: 'bg-yellow-100 text-yellow-800' },
+      'listo_para_recoger': { label: 'Listo para Recoger', color: 'bg-indigo-100 text-indigo-800' },
       'en_camino': { label: 'En Camino', color: 'bg-purple-100 text-purple-800' },
       'entregado': { label: 'Entregado', color: 'bg-green-100 text-green-800' },
     };
