@@ -9,6 +9,7 @@ import zonasDeliveryRoutes from '../modules/zonas-delivery/zonas-delivery.routes
 import metodosPagoRoutes from '../modules/metodos-pago/metodos-pago.routes.js';
 import pedidosRoutes from '../modules/pedidos/pedidos.routes.js';
 import tarjetasRoutes from '../modules/tarjetas/tarjetas.routes.js';
+import solicitudesProductosRoutes from '../modules/solicitudes-productos/solicitudes-productos.routes.js';
 
 const router = Router();
 
@@ -22,5 +23,6 @@ router.use('/zonas-delivery', zonasDeliveryRoutes);
 router.use('/metodos-pago', metodosPagoRoutes);
 router.use('/pedidos', pedidosRoutes);
 router.use('/tarjetas', tarjetasRoutes);
+router.use('/solicitudes-productos', solicitudesProductosRoutes);
 
 export default router;
