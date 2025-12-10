@@ -62,7 +62,7 @@ export const soloRolesAdmin = (req, res, next) => {
   }
 
   const rol = req.session.usuario.rol;
-  const permitido = ['admin', 'almacen', 'logistica'];
+  const permitido = ['admin', 'almacen', 'logistica', 'despachador', 'repartidor'];
 
   if (!permitido.includes(rol)) {
     return res.status(403).json({ message: 'Acceso denegado. Rol no autorizado' });
