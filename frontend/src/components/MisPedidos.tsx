@@ -18,11 +18,13 @@ interface PedidoResumen {
   proceso: string;
   total: number;
   direccion?: string;
-  tipoEntrega: string;
   costoEnvio: number;
   subtotal: number;
   descuentos: number;
   productos: ProductoPedido[];
+  nombre?: string;
+  distrito?: string;
+  idZonaDelivery?: number;
 }
 
 export function MisPedidos() {
@@ -36,6 +38,7 @@ export function MisPedidos() {
         const res = await fetch('/api/pedidos/mis-pedidos');
         if (!res.ok) throw new Error('Error al cargar pedidos');
         const data = await res.json();
+        console.log(data)
         setPedidos(Array.isArray(data) ? data : []);
       } catch (e) {
         setPedidos([]);
@@ -87,6 +90,8 @@ export function MisPedidos() {
         <ul className="space-y-4">
           {pedidos.map(p => {
             const estadoConfig = getEstadoConfig(p.proceso);
+            const isDomicilio = Number(p.costoEnvio) > 0;
+            const deliveryLabel = isDomicilio ? 'Delivery a domicilio' : 'Recojo en local';
             return (
             <li key={p.id} className="bg-white rounded-2xl shadow-md overflow-hidden">
               {/* Card Header */}
@@ -111,19 +116,27 @@ export function MisPedidos() {
               {/* Delivery Info */}
               <div className="p-4 bg-blue-50 border-b border-blue-100">
                 <div className="flex items-start gap-2">
-                  {p.tipoEntrega === 'domicilio' ? (
+                  {isDomicilio ? (
                     <IconTruck className="w-4 h-4 text-blue-700 shrink-0 mt-0.5" />
                   ) : (
                     <IconHome className="w-4 h-4 text-blue-700 shrink-0 mt-0.5" />
                   )}
                   <div className="flex-1">
                     <span className="text-sm font-semibold text-blue-900">
-                      {p.tipoEntrega === 'domicilio' ? 'Delivery a domicilio' : 'Recojo en local'}
+                      {deliveryLabel}
                     </span>
-                    {p.tipoEntrega === 'domicilio' && p.direccion && (
+                    {isDomicilio && p.direccion && (
                       <div className="flex items-start gap-1 mt-1">
                         <IconMapPin className="w-3 h-3 text-blue-600 shrink-0 mt-0.5" />
-                        <span className="text-xs text-blue-700">{p.direccion}</span>
+                        <div className="text-xs text-blue-700">{p.direccion} | </div>
+                        {p.distrito && <div className="text-xs text-blue-700">Distrito: {p.distrito}</div>}
+                      </div>
+                    )}
+                    {!isDomicilio && (
+                      <div className="text-xs text-blue-700 mt-1">
+                        <span className="font-medium">Lugar de recojo:</span>
+                        <div className="text-xs">{p.direccion ?? 'Local disponible'}</div>
+                        {p.distrito && <div className="text-xs text-blue-700">Distrito: {p.distrito}</div>}
                       </div>
                     )}
                     <div className="text-xs text-blue-700 mt-1">
